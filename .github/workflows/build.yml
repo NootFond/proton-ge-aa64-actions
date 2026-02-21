@@ -180,7 +180,7 @@ jobs:
             # patch -p1 < patches/ntsync.patch || true
           fi
 
-            - name: Build Hangover Emulator DLLs (PE)
+      - name: Build Hangover Emulator DLLs (PE)
         if: github.event.inputs.exclude_hangover == 'false'
         run: |
           cd $SOURCE_DIR/hangover-src
