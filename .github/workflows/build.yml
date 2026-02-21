@@ -221,18 +221,20 @@ jobs:
                 git clone --depth 1 https://github.com/FEX-Emu/FEX.git fex
               fi
               
-              # FEX ARM64EC (x86_64 模拟) - 使用 ARM64EC ABI
+              # FEX ARM64EC (x86_64 模拟 ) - 使用 ARM64EC ABI
               mkdir -p fex/build-arm64ec && cd fex/build-arm64ec
               cmake -GNinja \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_TOOLCHAIN_FILE=../Data/CMake/toolchain_mingw.cmake \
                 -DMINGW_TRIPLE=arm64ec-w64-mingw32 \
+                -DCMAKE_C_COMPILER=arm64ec-w64-mingw32-clang \
+                -DCMAKE_CXX_COMPILER=arm64ec-w64-mingw32-clang \
                 -DENABLE_LTO=${{ github.event.inputs.disable_lto == 'false' && 'True' || 'False' }} \
                 -DBUILD_TESTING=False \
                 -DENABLE_JEMALLOC_GLIBC_ALLOC=False \
                 -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
                 ..
-              ninja libarm64ecfex || make -j$(nproc) libarm64ecfex
+              ninja libarm64ecfex
               
               cd ../..
               # FEX WOW64 (x86 模拟) - 标准 ARM64
@@ -241,18 +243,20 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_TOOLCHAIN_FILE=../Data/CMake/toolchain_mingw.cmake \
                 -DMINGW_TRIPLE=aarch64-w64-mingw32 \
+                -DCMAKE_C_COMPILER=aarch64-w64-mingw32-clang \
+                -DCMAKE_CXX_COMPILER=aarch64-w64-mingw32-clang \
                 -DENABLE_LTO=${{ github.event.inputs.disable_lto == 'false' && 'True' || 'False' }} \
                 -DBUILD_TESTING=False \
                 -DENABLE_JEMALLOC_GLIBC_ALLOC=False \
                 -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR \
                 ..
-              ninja libwow64fex || make -j$(nproc) libwow64fex
+              ninja libwow64fex
               ;;
               
             box64)
+              # ... (box64 部分无需修改，但为了完整性保留)
               echo "Building Box64..."
               
-              # 检查 Box64 子模块
               if [ ! -d "box64" ]; then
                 echo "Box64 submodule not found, cloning manually..."
                 git clone --depth 1 https://github.com/ptitSeb/box64.git box64
@@ -263,17 +267,17 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_TOOLCHAIN_FILE=../../Data/CMake/toolchain_mingw.cmake \
                 -DMINGW_TRIPLE=aarch64-w64-mingw32 \
-                -DBUILD_TESTING=False \
+                -DCMAKE_C_COMPILER=aarch64-w64-mingw32-clang \
+                -DCMAKE_CXX_COMPILER=aarch64-w64-mingw32-clang \
                 ..
-              ninja wowbox64 || make -j$(nproc) wowbox64
+              ninja wowbox64
               ;;
               
-            qemu)
+            qemu )
               echo "QEMU support has been removed from Hangover, please use FEX or Box64"
               exit 1
               ;;
           esac
-
 
       - name: Build Wine Native (Tools)
         run: |
